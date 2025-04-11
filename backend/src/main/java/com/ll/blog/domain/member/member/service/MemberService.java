@@ -2,72 +2,87 @@ package com.ll.blog.domain.member.member.service;
 
 import com.ll.blog.domain.member.member.entity.Member;
 import com.ll.blog.domain.member.member.repository.MemberRepository;
-import com.ll.blog.global.jwt.JwtProvider;
-import com.ll.blog.global.rsData.RsData;
-import com.ll.blog.global.security.SecurityUser;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.hibernate.service.spi.ServiceException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
+    private final AuthTokenService authTokenService;
     private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtProvider jwtProvider;
 
-    public Member join(String username, String password) {
-        Member CheckedSignUpMember = memberRepository.findByUsername(username);
+    public long count() {
+        return memberRepository.count();
+    }
 
-        if (CheckedSignUpMember != null) {
-            throw new IllegalArgumentException("이미 존재하는 회원입니다.");
-        }
+    public Member join(String username, String password, String nickname) {
+        memberRepository
+                .findByUsername(username)
+                .ifPresent(existingMember -> {
+                    throw new ServiceException("해당 username은 이미 사용중입니다.");
+                });
 
         Member member = Member.builder()
                 .username(username)
-                .password(passwordEncoder.encode(password))
+                .password(password)
+                .nickname(nickname)
+                .apiKey(UUID.randomUUID().toString())
                 .build();
-
-        String refreshToken = jwtProvider.genRefreshToken(member);
-        member.setRefreshToken(refreshToken);
 
         return memberRepository.save(member);
     }
 
-    public Optional<Member> findById(Long id) {
-        return memberRepository.findById(id);
-    }
-
-    public Member getMember(String username) {
+    public Optional<Member> findByUsername(String username) {
         return memberRepository.findByUsername(username);
     }
 
-    // 토큰 유효성 검증
-    public boolean validateToken(String token) {
-        return jwtProvider.verify(token);
+    public Optional<Member> findById(long authorId) {
+        return memberRepository.findById(authorId);
     }
 
-    // 토큰갱신
-    public RsData<String> refreshAccessToken(String refreshToken) {
-        Member member = memberRepository.findByRefreshToken(refreshToken).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 토큰입니다."));
-
-        String accessToken = jwtProvider.genAccessToken(member);
-
-        return new RsData<>("200", "토큰 갱신에 성공하였습니다.", accessToken);
+    public Optional<Member> findByApiKey(String apiKey) {
+        return memberRepository.findByApiKey(apiKey);
     }
 
-    // 토큰으로 User 정보 가져오기
-    public SecurityUser getUserFromAccessToken(String accessToken) {
-        Map<String, Object> payloadBody = jwtProvider.getClaims(accessToken);
-        long id = (int) payloadBody.get("id");
-        String username = (String) payloadBody.get("username");
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        return new SecurityUser(id, username, "", authorities);
+    public String genAccessToken(Member member) {
+        return authTokenService.genAccessToken(member);
+    }
+
+    public String genAuthToken(Member member) {
+        return member.getApiKey() + " " + genAccessToken(member);
+    }
+
+    public Member getMemberFromAccessToken(String accessToken) {
+        Map<String, Object> payload = authTokenService.payload(accessToken);
+
+        if (payload == null) return null;
+
+        long id = (long) payload.get("id");
+        String username = (String) payload.get("username");
+        String nickname = (String) payload.get("nickname");
+
+        Member member = new Member(id, username, nickname);
+
+        return member;
+    }
+
+    public void modify(Member member, @NotBlank String nickname) {
+        member.setNickname(nickname);
+    }
+
+    public Member modifyOrJoin(String username, String nickname) {
+        Optional<Member> opMember = findByUsername(username);
+        if (opMember.isPresent()) {
+            Member member = opMember.get();
+            modify(member, nickname);
+            return member;
+        }
+        return join(username, "", nickname);
     }
 }
