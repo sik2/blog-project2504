@@ -14,6 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final CustomAuthenticationFilter customAuthenticationFilter;
     private final CustomOAuth2AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler;
+    private final CustomAuthorizationRequestResolver customAuthorizationRequestResolver;
 
     @Bean
     public SecurityFilterChain baseSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -47,6 +48,11 @@ public class SecurityConfig {
                 .oauth2Login(
                         oauth2Login -> oauth2Login
                                 .successHandler(customOAuth2AuthenticationSuccessHandler)
+                                .authorizationEndpoint(
+                                        authorizationEndpoint ->
+                                                authorizationEndpoint
+                                                        .authorizationRequestResolver(customAuthorizationRequestResolver)
+                                )
                 )
                 .addFilterBefore(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

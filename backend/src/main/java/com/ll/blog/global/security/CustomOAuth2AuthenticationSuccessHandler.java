@@ -2,7 +2,6 @@ package com.ll.blog.global.security;
 
 import com.ll.blog.domain.member.member.entity.Member;
 import com.ll.blog.domain.member.member.service.MemberService;
-import com.ll.blog.global.app.AppConfig;
 import com.ll.blog.global.rq.Rq;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,7 +26,7 @@ public class CustomOAuth2AuthenticationSuccessHandler extends SavedRequestAwareA
         // 토큰 발급
         rq.makeAuthCookies(actor);
 
-        String redirectUrl = AppConfig.getSiteFrontUrl();
+        String redirectUrl = request.getParameter("state");
 
         // 프론트 주소로 redirect
         response.sendRedirect(redirectUrl);
