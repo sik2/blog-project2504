@@ -1,5 +1,7 @@
 package com.ll.blog.global.security;
 
+import com.ll.blog.domain.member.member.entity.Member;
+import com.ll.blog.domain.member.member.service.MemberService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -14,6 +16,8 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+    private final MemberService memberService;
+
     // 소셜 로그인이 성공할 때마다 이 함수가 실행된다.
     @Transactional
     @Override
@@ -29,6 +33,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String nickname = attributesProperties.get("nickname");
         String profileImgUrl = attributesProperties.get("profile_image");
         String username = providerTypeCode + "__" + oauthId;
+
+        // 서비스 회원가입
+        Member member = memberService.modifyOrJoin(username, nickname);
+
         return new SecurityUser(
                 0,
                 username,
