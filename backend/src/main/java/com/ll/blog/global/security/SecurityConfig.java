@@ -45,9 +45,8 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .oauth2Login(
-                        oauth2Login -> {
-                            // Configure OAuth2 login
-                        }
+                        oauth2Login -> oauth2Login
+                                .successHandler(customOAuth2AuthenticationSuccessHandler)
                 )
                 .addFilterBefore(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
