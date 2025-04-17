@@ -28,6 +28,8 @@ public class SecurityConfig {
                         authorizeRequests
                                 .requestMatchers("/h2-console/**")
                                 .permitAll()
+                                .requestMatchers("/api/*/members/login", "/api/*/members/logout", "/api/*/members/join")
+                                .permitAll()
                                 .requestMatchers("/api/*/**")
                                 .authenticated()
                                 .anyRequest()
