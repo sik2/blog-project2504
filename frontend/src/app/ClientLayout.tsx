@@ -7,7 +7,9 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     const redirectUrlAfterSocialLogin = process.env.NEXT_PUBLIC_FRONT_BASE_URL
 
     useEffect(() => {
-        fetch('/api/members/me')
+        fetch('http://localhost:8090/api/v1/members/me', {
+            credentials: 'include',
+        })
             .then((response) => response.json())
             .then((data) => {
                 console.log(data)
