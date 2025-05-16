@@ -1,12 +1,8 @@
-import { createContext, useState, use } from "react";
+import { components } from "@/lib/backend/apiV1/schema";
 import { useRouter } from "next/navigation";
+import { createContext, use, useState } from "react";
 
-type Member = {
-  id: number;
-  createDate: string;
-  modifyDate: string;
-  nickname: string;
-};
+type Member = components["schemas"]["MemberDto"];
 
 export const LoginMemberContext = createContext<{
   loginMember: Member;

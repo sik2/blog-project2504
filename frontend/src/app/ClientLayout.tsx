@@ -2,6 +2,7 @@
 
 import Footer from '@/components/layout/Footer'
 import Header from '@/components/layout/Header'
+import client from '@/lib/backend/clinet'
 import { LoginMemberContext, useLoginMember } from '@/stores/auth/loginMember'
 import { useEffect } from 'react'
 
@@ -20,16 +21,15 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     }
 
     useEffect(() => {
-        fetch('http://localhost:8090/api/v1/members/me', {
-            credentials: 'include',
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                setLoginMember(data)
-            })
-            .catch((error) => {
+        const fetchLoginMember = async () => {
+            const { data, error } = await client.GET('/api/v1/members/me')
+            if (error) {
                 setNoLoginMember()
-            })
+            } else {
+                setLoginMember(data)
+            }
+        }
+        fetchLoginMember()
     }, [])
 
     if (isLoginMemberPending) {

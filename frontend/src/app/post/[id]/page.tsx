@@ -1,6 +1,7 @@
 'use client'
 
 import { components } from '@/lib/backend/apiV1/schema'
+import client from '@/lib/backend/clinet'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -17,16 +18,16 @@ export default function PostDetail() {
     useEffect(() => {
         const fetchPost = async () => {
             try {
-                const response = await fetch(`http://localhost:8090/api/v1/posts/${params.id}`, {
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
+                const { data, error } = await client.GET('/api/v1/posts/{id}', {
+                    params: {
+                        path: { id: Number(params.id) },
                     },
                 })
-                if (!response.ok) {
+
+                if (error) {
                     throw new Error('포스트를 불러오는데 실패했습니다')
                 }
-                const data = await response.json()
+
                 setPost(data)
             } catch (err) {
                 setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다')

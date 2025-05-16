@@ -1,6 +1,7 @@
 'use client'
 
 import { components } from '@/lib/backend/apiV1/schema'
+import client from '@/lib/backend/clinet'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -14,16 +15,12 @@ export default function Post() {
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const response = await fetch('http://localhost:8090/api/v1/posts', {
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                })
-                if (!response.ok) {
+                const { data, error } = await client.GET('/api/v1/posts')
+
+                if (error) {
                     throw new Error('포스트를 불러오는데 실패했습니다')
                 }
-                const data = await response.json()
+
                 setPosts(data)
             } catch (err) {
                 setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다')
