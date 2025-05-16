@@ -1,10 +1,9 @@
 'use client'
 
-import Link from 'next/link'
-import { useEffect } from 'react'
-import { LoginMemberContext, useLoginMember } from '@/stores/auth/loginMember'
 import Footer from '@/components/layout/Footer'
 import Header from '@/components/layout/Header'
+import { LoginMemberContext, useLoginMember } from '@/stores/auth/loginMember'
+import { useEffect } from 'react'
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
     const { loginMember, setLoginMember, setNoLoginMember, isLoginMemberPending, isLogin, logout, logoutAndHome } =

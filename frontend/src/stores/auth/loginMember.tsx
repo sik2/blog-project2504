@@ -75,7 +75,6 @@ export function useLoginMember() {
     isLoginMemberPending,
     setNoLoginMember,
     isLogin,
-
     logout,
     logoutAndHome,
   };
