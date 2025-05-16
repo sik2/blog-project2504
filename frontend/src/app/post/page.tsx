@@ -1,17 +1,13 @@
 'use client'
 
+import { components } from '@/lib/backend/apiV1/schema'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-interface Post {
-    id: number
-    string: string
-    content: string
-    author: string
-}
+type post = components['schemas']['PostDto']
 
 export default function Post() {
-    const [posts, setPosts] = useState<Post[]>([])
+    const [posts, setPosts] = useState<post[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 

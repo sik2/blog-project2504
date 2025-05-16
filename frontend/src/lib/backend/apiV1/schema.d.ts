@@ -76,7 +76,7 @@ export interface components {
     schemas: {
         PostDto: {
             /** Format: int64 */
-            id?: number;
+            id: number;
             string?: string;
             content?: string;
             author?: string;
