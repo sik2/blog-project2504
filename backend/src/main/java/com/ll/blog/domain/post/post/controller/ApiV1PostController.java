@@ -1,6 +1,8 @@
 package com.ll.blog.domain.post.post.controller;
 
 import com.ll.blog.domain.post.post.dto.PostDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,11 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 
+@Tag(name = "ApiV1PostController", description = "API 게시글 컨트롤러")
 @RestController
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
 public class ApiV1PostController {
     @GetMapping
+    @Operation(summary = "게시글 다건조회")
     public List<PostDto> getPosts() {
         ArrayList<PostDto> postDtoList = new ArrayList<>();
 
@@ -26,6 +30,7 @@ public class ApiV1PostController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "게시글 단건조회")
     public PostDto getPost() {
         ArrayList<PostDto> postDtoList = new ArrayList<>();
 

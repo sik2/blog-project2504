@@ -40,3 +40,5 @@ out/
 application-secret.yml
 
 db_dev.*
+
+apiV1.json
